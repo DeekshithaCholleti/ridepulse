@@ -7,7 +7,7 @@ const router = express.Router();
 router.get('/', protect, controller.listShuttles);
 router.get('/:id', protect, controller.getShuttle);
 router.post('/', protect, allowRoles('admin'), controller.createShuttle);
-router.put('/:id', protect, allowRoles('admin'), controller.updateShuttle);
+router.put('/:id', protect, allowRoles('admin', 'driver'), controller.updateShuttle);
 router.delete('/:id', protect, allowRoles('admin'), controller.deleteShuttle);
 
 module.exports = router;
