@@ -1,0 +1,47 @@
+import { Link, useNavigate } from 'react-router-dom';
+import { Bus, ArrowRight } from 'lucide-react';
+
+export default function Login() {
+  const navigate = useNavigate();
+
+  const handleLogin = (e) => {
+    e.preventDefault();
+    navigate('/dashboard');
+  };
+
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 p-4">
+      <div className="w-full max-w-md bg-white/90 backdrop-blur-md rounded-2xl shadow-xl overflow-hidden">
+        <div className="p-8">
+          <div className="flex justify-center mb-8">
+            <div className="bg-indigo-600 p-3 rounded-full text-white">
+              <Bus size={32} />
+            </div>
+          </div>
+          <h2 className="text-3xl font-extrabold text-center text-gray-900 mb-2">Welcome Back</h2>
+          <p className="text-center text-gray-600 mb-8">Log in to track your campus shuttle</p>
+          
+          <form onSubmit={handleLogin} className="space-y-6">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="email">Email Address</label>
+              <input id="email" type="email" className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors" placeholder="student@university.edu" required />
+            </div>
+            <div>
+              <div className="flex justify-between items-center mb-1">
+                <label className="block text-sm font-medium text-gray-700" htmlFor="password">Password</label>
+                <a href="#" className="text-sm font-medium text-indigo-600 hover:text-indigo-500">Forgot password?</a>
+              </div>
+              <input id="password" type="password" className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors" placeholder="••••••••" required />
+            </div>
+            <button type="submit" className="w-full flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded-lg transition-all duration-200 transform hover:scale-[1.02]">
+              Sign In <ArrowRight size={20} />
+            </button>
+          </form>
+        </div>
+        <div className="bg-gray-50 p-6 text-center border-t border-gray-100">
+          <p className="text-sm text-gray-600">Don't have an account? <Link to="/signup" className="font-bold text-indigo-600 hover:text-indigo-500">Sign up now</Link></p>
+        </div>
+      </div>
+    </div>
+  );
+}
