@@ -34,9 +34,9 @@ const seedData = async () => {
 		});
 
 		const driver1 = await User.create({
-			name: 'John Doe',
-			email: 'driver1@ridepulse.com',
-			password: 'password123',
+			name: 'John Doe (Shuttle Driver)',
+			email: 'driver@gmail.com',
+			password: '123456789',
 			role: 'driver'
 		});
 

@@ -7,6 +7,7 @@ import type {
   ServiceAlert,
   UserRole,
   CrowdLevel,
+  ShuttleStatus,
 } from '../types';
 import {
   INITIAL_SHUTTLES,
@@ -44,6 +45,7 @@ interface ShuttleContextType {
   setSelectedLocationId: (id: string | null) => void;
   setUserRole: (role: UserRole) => void;
   setSimulationActive: (active: boolean) => void;
+  updateShuttleStatus: (shuttleId: string, status: ShuttleStatus) => void;
   updatePassengers: (shuttleId: string, countIn: number, countOut: number) => PassengerUpdateResult;
   reportDelay: (shuttleId: string, delayMinutes: number, reason: string) => void;
   reportIssue: (shuttleId: string, issueText: string) => void;
@@ -85,6 +87,11 @@ export const ShuttleProvider: React.FC<{ children: ReactNode }> = ({ children })
                 : s
             )
           );
+        } else if (event.data?.type === 'STATUS_UPDATE') {
+          const { shuttleId, status } = event.data.payload;
+          setShuttles((prev) =>
+            prev.map((s) => (s.id === shuttleId ? { ...s, status } : s))
+          );
         } else if (event.data?.type === 'ALERT_ADDED') {
           setAlerts((prev) => [event.data.payload, ...prev]);
         }
@@ -104,6 +111,14 @@ export const ShuttleProvider: React.FC<{ children: ReactNode }> = ({ children })
       }
     }
   };
+
+  // Driver action: update shuttle operational status (e.g. ON_TIME vs OFF_SERVICE)
+  const updateShuttleStatus = useCallback((shuttleId: string, status: ShuttleStatus) => {
+    setShuttles((prev) =>
+      prev.map((s) => (s.id === shuttleId ? { ...s, status } : s))
+    );
+    broadcastEvent('STATUS_UPDATE', { shuttleId, status });
+  }, []);
 
   // Driver action: update passenger count with bound validation
   const updatePassengers = useCallback(
@@ -246,7 +261,7 @@ export const ShuttleProvider: React.FC<{ children: ReactNode }> = ({ children })
       setShuttles((prevShuttles) =>
         prevShuttles.map((shuttle) => {
           const route = routes.find((r) => r.id === shuttle.routeId);
-          if (!route || route.stops.length < 2 || shuttle.status === 'MAINTENANCE') {
+          if (!route || route.stops.length < 2 || shuttle.status === 'MAINTENANCE' || shuttle.status === 'OFF_SERVICE') {
             return shuttle;
           }
 
@@ -316,6 +331,7 @@ export const ShuttleProvider: React.FC<{ children: ReactNode }> = ({ children })
         setSelectedLocationId,
         setUserRole,
         setSimulationActive,
+        updateShuttleStatus,
         updatePassengers,
         reportDelay,
         reportIssue,

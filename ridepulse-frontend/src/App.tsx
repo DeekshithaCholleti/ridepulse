@@ -1,34 +1,26 @@
-import React, { useState } from 'react';
+import React from 'react';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { ShuttleProvider } from './context/ShuttleContext';
+import { AuthProvider } from './context/AuthContext';
 import { Navbar } from './components/Navbar';
 import { StudentDashboard } from './components/StudentDashboard';
 import { CampusMap } from './components/CampusMap';
 import { DriverDashboard } from './components/DriverDashboard';
+import { DriverLoginPage } from './components/DriverLoginPage';
+import { ProtectedRoute } from './components/ProtectedRoute';
 import { RoutesView } from './components/RoutesView';
 import { AlertsView } from './components/AlertsView';
-import { AdminDashboard } from './components/AdminDashboard';
 import { Bus } from 'lucide-react';
 
-export const AppContent: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<string>('dashboard');
-
+const StudentLayout: React.FC<{ children: React.ReactNode; tab: string }> = ({ children, tab }) => {
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans selection:bg-blue-600 selection:text-white">
       {/* Top Main Navbar */}
-      <Navbar activeTab={activeTab} setActiveTab={setActiveTab} />
+      <Navbar activeTab={tab} />
 
       {/* Main Content Area */}
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        {activeTab === 'dashboard' && <StudentDashboard />}
-        {activeTab === 'map' && (
-          <div className="h-[calc(100vh-140px)] w-full py-2">
-            <CampusMap />
-          </div>
-        )}
-        {activeTab === 'routes' && <RoutesView />}
-        {activeTab === 'alerts' && <AlertsView />}
-        {activeTab === 'driver' && <DriverDashboard />}
-        {activeTab === 'admin' && <AdminDashboard />}
+        {children}
       </main>
 
       {/* Footer */}
@@ -55,8 +47,64 @@ export const AppContent: React.FC = () => {
 
 export default function App() {
   return (
-    <ShuttleProvider>
-      <AppContent />
-    </ShuttleProvider>
+    <BrowserRouter>
+      <AuthProvider>
+        <ShuttleProvider>
+          <Routes>
+            {/* Student View Routes */}
+            <Route
+              path="/"
+              element={
+                <StudentLayout tab="dashboard">
+                  <StudentDashboard />
+                </StudentLayout>
+              }
+            />
+            <Route
+              path="/map"
+              element={
+                <StudentLayout tab="map">
+                  <div className="h-[calc(100vh-140px)] w-full py-2">
+                    <CampusMap />
+                  </div>
+                </StudentLayout>
+              }
+            />
+            <Route
+              path="/routes"
+              element={
+                <StudentLayout tab="routes">
+                  <RoutesView />
+                </StudentLayout>
+              }
+            />
+            <Route
+              path="/alerts"
+              element={
+                <StudentLayout tab="alerts">
+                  <AlertsView />
+                </StudentLayout>
+              }
+            />
+
+            {/* Public Driver Login Route */}
+            <Route path="/driver/login" element={<DriverLoginPage />} />
+
+            {/* Protected Driver Panel Route */}
+            <Route
+              path="/driver"
+              element={
+                <ProtectedRoute>
+                  <DriverDashboard />
+                </ProtectedRoute>
+              }
+            />
+
+            {/* Fallback Catch-All Route */}
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </ShuttleProvider>
+      </AuthProvider>
+    </BrowserRouter>
   );
 }
